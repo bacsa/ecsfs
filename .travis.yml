@@ -1,0 +1,24 @@
+sudo: required
+language: node_js
+node_js:
+  - "7"
+services: 
+  - docker
+
+before_install:
+  - docker build -t reacttest -f Dockerfile .
+
+deploy:
+  provider: elasticbeanstalk
+  region: "eu-central-1"
+  app: "test-react-app"
+  env: "TestReactApp-env"
+  bucket_name: "elasticbeanstalk-eu-central-1-044016133399"
+  bucket_path: "docker-awss2-api"
+  on:
+    branch: master
+  access_key_id: $TRAVIS_ACCESS_KEY
+  secret_access_key: "$TRAVIS_SECRET_KEY"
+
+
+
