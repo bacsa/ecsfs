@@ -6,7 +6,23 @@ services:
   - docker
 
 before_install:
-  - docker build -t bacsa/reacttest -f Dockerfile .
+  - docker build -t bacsa/reacttest -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run bacsa/reacttest npm test -- --coverage
+
+after_success:
+  - docker build -t bacsa/multi-client ./client
+  - docker build -t bacsa/multi-server ./server
+  - docker build -t bacsa/multi-nginx ./nginx
+  - docker build -t bacsa/multi-worker ./worker
+  # Log in to Docker CLI
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  # Take those images and push them to docker hub
+  - docker push bacsa/multi-client
+  - docker push bacsa/multi-nginx
+  - docker push bacsa/multi-server
+  - docker push bacsa/multi-worker
 
 deploy:
   provider: elasticbeanstalk
